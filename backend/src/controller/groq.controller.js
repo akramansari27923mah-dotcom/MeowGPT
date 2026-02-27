@@ -7,7 +7,9 @@ const GroqClient = new Groq({
 
 const groq = async (req, res) => {
     try {
-        const { message, history} = req.body;
+        const { message, history } = req.body;
+
+        const safeHistory = Array.isArray(history) ? history : []
 
         const Completion = await GroqClient.chat.completions.create({
             model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
@@ -23,7 +25,7 @@ Respond like ChatGPT:
 - Be concise but helpful
 `
                 },
-                ...history,
+                ...safeHistory,
                 {
                     role: 'user',
                     content: message
