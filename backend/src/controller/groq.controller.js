@@ -9,7 +9,7 @@ const groq = async (req, res) => {
     try {
         const { message, history } = req.body;
 
-        const safeHistory = Array.isArray(history) ? history : []
+        const safeHistory = Array.isArray(history) ? history.slice(-8) : []
 
         const Completion = await GroqClient.chat.completions.create({
             model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
