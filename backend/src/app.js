@@ -10,4 +10,8 @@ app.use(express.json())
 // PREFIX
 app.use('/api/groq', growRouter)
 
+app.get('/me', (req, res) => {
+    res.send('api is running')
+})
+
 export default app
