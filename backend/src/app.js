@@ -3,7 +3,14 @@ import cors from 'cors';
 import growRouter from './router/groq.routes.js'
 
 const app = express()
-app.use(cors())
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://akramdev.vercel.app"
+    ],
+    methods: ["GET", "POST", "DELETE", "PUT"],
+}))
+
 app.use(express.json())
 
 

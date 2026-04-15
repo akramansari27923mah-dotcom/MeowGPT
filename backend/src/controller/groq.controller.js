@@ -1,22 +1,20 @@
 import Groq from "groq-sdk";
-import 'dotenv/config';
+import "dotenv/config";
 
 const GroqClient = new Groq({
-    apiKey: process.env.GROQ_API_KEY
-})
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 const groq = async (req, res) => {
-    try {
-        const { message, history } = req.body;
+  try {
+    const { message, history } = req.body;
 
-        const safeHistory = Array.isArray(history) ? history.slice(-8) : []
+    const safeHistory = Array.isArray(history) ? history.slice(-8) : [];
 
-        const Completion = await GroqClient.chat.completions.create({
-            model: 'openai/gpt-oss-120b',
-            messages: [
-                {
-                    role: 'system',
-                    content: `You are AkramAI — the personal AI assistant of developer Akram Ansari.
+    const messages = [
+      {
+        role: "system",
+        content: `You are AkramAI — the personal AI assistant of developer Akram Ansari.
 
 Your role is to help visitors understand Akram’s skills, projects, and experience, and guide them toward collaboration, hiring, or networking opportunities.
 
@@ -30,6 +28,9 @@ Always respond in a friendly, professional, and helpful tone. Keep answers clear
 
 💻 Skills:
 HTML, CSS, Tailwind CSS, JavaScript, React.js, Node.js, Express.js, MongoDB
+
+Tools & Deployment:
+Git, GitHub, Postman, Vercel, Render
 
 🚀 About Work:
 Akram builds modern, responsive, and user-friendly full-stack web applications.  
@@ -52,6 +53,9 @@ A full-stack notes management application where users can create, manage, and or
 An AI-based notes application that helps users generate and manage smart notes.  
 🔗 https://ai-notes-frontend-x9sz.vercel.app/  
 
+4. NoteCraft AI 🤖  
+An AI-powered Notes generate web application where users can interact with AI in real-time.  
+🔗 https://notecraftai.vercel.app/
 👉 If users want to explore more projects, guide them to Akram’s LinkedIn.
 
 ----------------------------------------
@@ -97,28 +101,60 @@ Help visitors:
 - Understand Akram’s skills and expertise
 - Explore his projects
 - Connect with him for job opportunities, freelance work, or collaboration
-`
-                },
-                ...safeHistory,
-                {
-                    role: 'user',
-                    content: message
-                }
-            ]
-        })
+`,
+      },
+      ...safeHistory,
+      {
+        role: "user",
+        content: message,
+      },
+    ];
 
-        res.json({
-            reply: Completion.choices[0]?.message?.content || ''
-        })
+    const callAi = async (model) => {
+      return Promise.race([
+        GroqClient.chat.completions.create({
+          model,
+          messages,
+        }),
 
-    }
-    catch (err) {
-        console.error(err)
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout")), 20000),
+        ),
+      ]);
+    };
+    
+    let aiResponse = '';
+
+    try {
+      const result = await callAi("llama-3.3-70b-versatile");
+      aiResponse = result.choices[0]?.message?.content || "";
+    } catch (err) {
+      console.log("Primary model is failed, switching...");
+      try {
+        const result = await callAi("llama-3.1-8b-instant");
+        aiResponse = result.choices[0]?.message?.content || "";
+      } catch (err) {
+        console.log("Fallback is also failed", err);
         res.status(500).json({
             success: false,
-            message: 'GROQ API FAILDE'
+            messageError: "AI is currently busy. Please try again later"
         })
+      }
     }
-}
 
-export default groq
+
+    res.status(201).json({
+        success: true,
+        message: 'Replied successfully',
+        reply: aiResponse
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "GROQ API FAILDE",
+    });
+  }
+};
+
+export default groq;
