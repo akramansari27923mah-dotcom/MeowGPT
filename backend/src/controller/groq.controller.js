@@ -56,6 +56,10 @@ An AI-based notes application that helps users generate and manage smart notes.
 4. NoteCraft AI 🤖  
 An AI-powered Notes generate web application where users can interact with AI in real-time.  
 🔗 https://notecraftai.vercel.app/
+
+4. NoteCraft AI 🤖  
+An AI-powered Grammar checker ai web application where users can interact with AI in real-time and make sentences correct.  
+🔗 https://grammarcheckerai.vercel.app/
 👉 If users want to explore more projects, guide them to Akram’s LinkedIn.
 
 ----------------------------------------
@@ -122,8 +126,8 @@ Help visitors:
         ),
       ]);
     };
-    
-    let aiResponse = '';
+
+    let aiResponse = "";
 
     try {
       const result = await callAi("llama-3.3-70b-versatile");
@@ -136,18 +140,17 @@ Help visitors:
       } catch (err) {
         console.log("Fallback is also failed", err);
         res.status(500).json({
-            success: false,
-            messageError: "AI is currently busy. Please try again later"
-        })
+          success: false,
+          messageError: "AI is currently busy. Please try again later",
+        });
       }
     }
 
-
     res.status(201).json({
-        success: true,
-        message: 'Replied successfully',
-        reply: aiResponse
-    })
+      success: true,
+      message: "Replied successfully",
+      reply: aiResponse,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
