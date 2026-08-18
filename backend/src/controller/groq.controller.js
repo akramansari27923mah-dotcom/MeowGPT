@@ -130,12 +130,12 @@ Help visitors:
     let aiResponse = "";
 
     try {
-      const result = await callAi("llama-3.3-70b-versatile");
+      const result = await callAi("openai/gpt-oss-120b");
       aiResponse = result.choices[0]?.message?.content || "";
     } catch (err) {
       console.log("Primary model is failed, switching...");
       try {
-        const result = await callAi("llama-3.1-8b-instant");
+        const result = await callAi("openai/gpt-oss-20b");
         aiResponse = result.choices[0]?.message?.content || "";
       } catch (err) {
         console.log("Fallback is also failed", err);
